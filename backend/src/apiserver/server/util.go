@@ -50,16 +50,11 @@ func GetPipelineName(queryString string, fileName string) (string, error) {
 
 func loadFile(fileReader io.Reader, maxFileLength int) ([]byte, error) {
 	reader := bufio.NewReader(fileReader)
-	pipelineFile := make([]byte, maxFileLength+1)
-	size, err := reader.Read(pipelineFile)
+	pipelineFile, err := io.ReadAll(reader)
 	if err != nil && err != io.EOF {
-		return nil, util.NewInvalidInputErrorWithDetails(err, "Error read pipeline file.")
+		return nil, err
 	}
-	if size == maxFileLength+1 {
-		return nil, util.NewInvalidInputError("File size too large. Maximum supported size: %v", maxFileLength)
-	}
-
-	return pipelineFile[:size], nil
+	return pipelineFile, nil
 }
 
 func isYamlFile(fileName string) bool {
